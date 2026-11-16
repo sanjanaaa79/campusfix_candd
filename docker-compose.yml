@@ -1,0 +1,26 @@
+services:
+  campusfix-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: campusfix:latest
+    container_name: campusfix-app
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-5000}:5000"
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=${SECRET_KEY:-campusfix-production-secret-key-change-me}
+      - DATABASE_URL=sqlite:////app/data/campusfix.db
+      - ADMIN_NAME=${ADMIN_NAME:-Campus Administrator}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@campusfix.edu}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-Admin@12345}
+    volumes:
+      # Persistent host volume to preserve database between container restarts/rebuilds
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

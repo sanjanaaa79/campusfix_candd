@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Login – CampusFix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5 col-xl-4">
+            <div class="card card-custom p-4 p-sm-5 border-0 shadow-lg">
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary rounded-3 text-white p-2 mb-3" style="width: 44px; height: 44px;">
+                        <i data-lucide="lock" style="width: 22px; height: 22px;"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">Welcome Back</h3>
+                    <p class="text-muted small">Sign in to your CampusFix account</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Campus Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted">
+                                <i data-lucide="mail" style="width: 16px; height: 16px;"></i>
+                            </span>
+                            <input 
+                                type="email" 
+                                class="form-control border-start-0" 
+                                id="email" 
+                                name="email" 
+                                placeholder="name@campus.edu" 
+                                value="{{ email or '' }}" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label for="password" class="form-label">Password</label>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted">
+                                <i data-lucide="key" style="width: 16px; height: 16px;"></i>
+                            </span>
+                            <input 
+                                type="password" 
+                                class="form-control border-start-0" 
+                                id="password" 
+                                name="password" 
+                                placeholder="Enter your password" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" name="remember" id="remember">
+                        <label class="form-check-label small text-muted" for="remember">
+                            Remember this browser
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2">
+                        <span>Sign In</span>
+                        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+                    </button>
+                </form>
+
+                <div class="text-center mt-4 pt-2 border-top">
+                    <p class="small text-muted mb-0">
+                        Don't have an account? 
+                        <a href="{{ url_for('auth.register') }}" class="text-primary fw-semibold text-decoration-none">Register as Student</a>
+                    </p>
+                </div>
+
+                <!-- Helper card for examination / demo testing -->
+                <div class="mt-4 p-3 bg-light rounded-3 border">
+                    <div class="d-flex align-items-center gap-1 text-primary fw-semibold small mb-1">
+                        <i data-lucide="info" style="width: 14px; height: 14px;"></i>
+                        <span>Default Admin Credentials:</span>
+                    </div>
+                    <div class="small text-muted font-monospace" style="font-size: 0.78rem;">
+                        Email: <strong>admin@campusfix.edu</strong><br>
+                        Password: <strong>Admin@12345</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

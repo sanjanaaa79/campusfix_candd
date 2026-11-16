@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}My Complaints – CampusFix{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="mb-4 px-2">
+            <h6 class="text-uppercase text-muted fw-bold small">Student Portal</h6>
+            <div class="fw-bold text-dark fs-5">{{ current_user.name }}</div>
+            <div class="text-muted small text-truncate">{{ current_user.email }}</div>
+        </div>
+
+        <nav class="nav flex-column">
+            <a class="nav-link" href="{{ url_for('student.dashboard') }}">
+                <i data-lucide="layout-dashboard" style="width: 18px; height: 18px;"></i>
+                <span>Overview</span>
+            </a>
+            <a class="nav-link" href="{{ url_for('student.submit_complaint') }}">
+                <i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i>
+                <span>Report Issue</span>
+            </a>
+            <a class="nav-link active" href="{{ url_for('student.my_complaints') }}">
+                <i data-lucide="clipboard-list" style="width: 18px; height: 18px;"></i>
+                <span>My Complaints</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="container-fluid p-0">
+            <!-- Header -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+                <div>
+                    <h2 class="fw-bold mb-1">My Reported Complaints</h2>
+                    <p class="text-muted mb-0">Track real-time status updates and resolution timelines.</p>
+                </div>
+                <a href="{{ url_for('student.submit_complaint') }}" class="btn btn-primary d-inline-flex align-items-center gap-2">
+                    <i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i>
+                    <span>Report New Issue</span>
+                </a>
+            </div>
+
+            <!-- Filter & Search Toolbar -->
+            <div class="card card-custom border-0 p-3 mb-4">
+                <form method="GET" action="{{ url_for('student.my_complaints') }}" class="row g-2 align-items-center">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+                            </span>
+                            <input 
+                                type="text" 
+                                class="form-control border-start-0" 
+                                name="q" 
+                                placeholder="Search title, location or description..." 
+                                value="{{ q or '' }}"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <select class="form-select auto-filter-select" name="status">
+                            <option value="">All Statuses</option>
+                            {% for st in statuses %}
+                                <option value="{{ st }}" {% if selected_status == st %}selected{% endif %}>{{ st }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <select class="form-select auto-filter-select" name="category">
+                            <option value="">All Categories</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-1 d-flex gap-1">
+                        <button type="submit" class="btn btn-navy w-100 px-2" title="Apply filter">
+                            <i data-lucide="filter" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        {% if q or selected_status or selected_category %}
+                            <a href="{{ url_for('student.my_complaints') }}" class="btn btn-outline-secondary px-2" title="Reset filter">
+                                <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+
+            <!-- Complaints Table Card -->
+            <div class="card card-custom border-0">
+                <div class="card-header-clean d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Tickets List ({{ complaints|length }})</span>
+                </div>
+
+                {% if complaints %}
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Complaint</th>
+                                    <th>Category</th>
+                                    <th>Location</th>
+                                    <th>Priority</th>
+                                    <th>Current Status</th>
+                                    <th>Submitted On</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in complaints %}
+                                    <tr>
+                                        <td class="fw-bold text-dark">#{{ c.id }}</td>
+                                        <td>
+                                            <div class="fw-semibold text-dark">{{ c.title }}</div>
+                                            <small class="text-muted text-truncate d-inline-block" style="max-width: 250px;">{{ c.description }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge-category">{{ c.category }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small d-flex align-items-center gap-1">
+                                                <i data-lucide="map-pin" style="width: 13px; height: 13px;"></i>
+                                                {{ c.location }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if c.priority == 'High' %}
+                                                <span class="badge-priority badge-priority-high">High</span>
+                                            {% elif c.priority == 'Medium' %}
+                                                <span class="badge-priority badge-priority-medium">Medium</span>
+                                            {% else %}
+                                                <span class="badge-priority badge-priority-low">Low</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if c.status == 'Pending' %}
+                                                <span class="badge-status badge-pending">
+                                                    <i data-lucide="clock" style="width: 12px; height: 12px;"></i> Pending
+                                                </span>
+                                            {% elif c.status == 'In Progress' %}
+                                                <span class="badge-status badge-in-progress">
+                                                    <i data-lucide="wrench" style="width: 12px; height: 12px;"></i> In Progress
+                                                </span>
+                                            {% else %}
+                                                <span class="badge-status badge-resolved">
+                                                    <i data-lucide="check" style="width: 12px; height: 12px;"></i> Resolved
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small">{{ c.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('student.complaint_detail', complaint_id=c.id) }}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1">
+                                                <span>Details</span>
+                                                <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="p-5 text-center">
+                        <div class="p-3 bg-light rounded-circle d-inline-flex mb-3 text-muted">
+                            <i data-lucide="search-x" style="width: 36px; height: 36px;"></i>
+                        </div>
+                        <h5 class="fw-bold">No complaints found</h5>
+                        <p class="text-muted small mb-3">Try adjusting your search criteria or register a new complaint.</p>
+                        <a href="{{ url_for('student.submit_complaint') }}" class="btn btn-primary btn-sm">
+                            Submit New Complaint
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

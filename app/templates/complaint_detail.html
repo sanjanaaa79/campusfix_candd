@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Complaint #{{ complaint.id }} – CampusFix{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 900px;">
+    <!-- Breadcrumb -->
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb small">
+                {% if current_user.role == 'admin' %}
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}" class="text-decoration-none">Admin Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.complaints_list') }}" class="text-decoration-none">All Complaints</a></li>
+                {% else %}
+                    <li class="breadcrumb-item"><a href="{{ url_for('student.dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('student.my_complaints') }}" class="text-decoration-none">My Complaints</a></li>
+                {% endif %}
+                <li class="breadcrumb-item active" aria-current="page">Ticket #{{ complaint.id }}</li>
+            </ol>
+        </nav>
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <span class="badge bg-secondary mb-2">Ticket #{{ complaint.id }}</span>
+                <h2 class="fw-bold mb-1">{{ complaint.title }}</h2>
+                <span class="text-muted small">Submitted on {{ complaint.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+            </div>
+            <div>
+                {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin.complaints_list') }}" class="btn btn-outline-secondary btn-sm">
+                        <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i> Back to List
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('student.my_complaints') }}" class="btn btn-outline-secondary btn-sm">
+                        <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i> Back to My Complaints
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Status & Attributes Card -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card card-custom p-3 border-0 h-100">
+                <span class="text-muted small text-uppercase fw-bold mb-1">Status</span>
+                <div>
+                    {% if complaint.status == 'Pending' %}
+                        <span class="badge-status badge-pending fs-6">
+                            <i data-lucide="clock" style="width: 16px; height: 16px;"></i> Pending
+                        </span>
+                    {% elif complaint.status == 'In Progress' %}
+                        <span class="badge-status badge-in-progress fs-6">
+                            <i data-lucide="wrench" style="width: 16px; height: 16px;"></i> In Progress
+                        </span>
+                    {% else %}
+                        <span class="badge-status badge-resolved fs-6">
+                            <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i> Resolved
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card card-custom p-3 border-0 h-100">
+                <span class="text-muted small text-uppercase fw-bold mb-1">Priority</span>
+                <div>
+                    {% if complaint.priority == 'High' %}
+                        <span class="badge-priority badge-priority-high fs-6">High Priority</span>
+                    {% elif complaint.priority == 'Medium' %}
+                        <span class="badge-priority badge-priority-medium fs-6">Medium Priority</span>
+                    {% else %}
+                        <span class="badge-priority badge-priority-low fs-6">Low Priority</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card card-custom p-3 border-0 h-100">
+                <span class="text-muted small text-uppercase fw-bold mb-1">Category</span>
+                <div>
+                    <span class="badge-category fs-6">{{ complaint.category }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Detail Card -->
+    <div class="card card-custom border-0 p-4 mb-4">
+        <h5 class="fw-bold mb-3 border-bottom pb-2">Issue Description & Location</h5>
+
+        <div class="mb-4">
+            <h6 class="text-muted small text-uppercase fw-bold mb-1">Specific Campus Location</h6>
+            <div class="p-3 bg-light rounded-3 d-flex align-items-center gap-2">
+                <i data-lucide="map-pin" class="text-danger" style="width: 20px; height: 20px;"></i>
+                <span class="fw-semibold">{{ complaint.location }}</span>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <h6 class="text-muted small text-uppercase fw-bold mb-1">Full Problem Description</h6>
+            <div class="p-3 bg-light rounded-3 text-dark" style="white-space: pre-line; line-height: 1.6;">
+                {{ complaint.description }}
+            </div>
+        </div>
+
+        <div class="row g-3 pt-3 border-top">
+            <div class="col-sm-6">
+                <h6 class="text-muted small text-uppercase fw-bold mb-1">Submitted By</h6>
+                <div class="fw-semibold">{{ complaint.author.name }}</div>
+                <div class="text-muted small">{{ complaint.author.email }}</div>
+            </div>
+            <div class="col-sm-6">
+                <h6 class="text-muted small text-uppercase fw-bold mb-1">Last Activity</h6>
+                <div class="fw-semibold">
+                    {% if complaint.updated_at %}
+                        {{ complaint.updated_at.strftime('%B %d, %Y at %I:%M %p') }}
+                    {% else %}
+                        {{ complaint.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolution Timeline Visualizer -->
+    <div class="card card-custom border-0 p-4 mb-4">
+        <h5 class="fw-bold mb-4">Resolution Progress</h5>
+        <div class="row text-center position-relative">
+            <div class="col-4">
+                <div class="p-3 rounded-3 bg-light border border-success border-2">
+                    <i data-lucide="check-circle" class="text-success mb-2" style="width: 28px; height: 28px;"></i>
+                    <div class="fw-bold small">1. Logged</div>
+                    <small class="text-muted">{{ complaint.created_at.strftime('%b %d') }}</small>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="p-3 rounded-3 bg-light border {{ 'border-primary border-2' if complaint.status in ['In Progress', 'Resolved'] else '' }}">
+                    <i data-lucide="wrench" class="{{ 'text-primary' if complaint.status in ['In Progress', 'Resolved'] else 'text-muted' }} mb-2" style="width: 28px; height: 28px;"></i>
+                    <div class="fw-bold small">2. Under Maintenance</div>
+                    <small class="text-muted">{{ 'Active' if complaint.status == 'In Progress' else ('Completed' if complaint.status == 'Resolved' else 'Pending') }}</small>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="p-3 rounded-3 bg-light border {{ 'border-success border-2' if complaint.status == 'Resolved' else '' }}">
+                    <i data-lucide="shield-check" class="{{ 'text-success' if complaint.status == 'Resolved' else 'text-muted' }} mb-2" style="width: 28px; height: 28px;"></i>
+                    <div class="fw-bold small">3. Resolved</div>
+                    <small class="text-muted">{{ 'Resolved' if complaint.status == 'Resolved' else 'Awaiting' }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Management Control Box (Only visible to admin) -->
+    {% if current_user.role == 'admin' %}
+        <div class="card card-custom border-0 p-4 border-start border-primary border-4 shadow-sm">
+            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-primary">
+                <i data-lucide="shield"></i>
+                <span>Admin Ticket Management</span>
+            </h5>
+            <form method="POST" action="{{ url_for('admin.update_complaint', complaint_id=complaint.id) }}" class="row g-3 align-items-end mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Update Status</label>
+                    <select class="form-select" name="status">
+                        <option value="Pending" {% if complaint.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="In Progress" {% if complaint.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                        <option value="Resolved" {% if complaint.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Update Priority</label>
+                    <select class="form-select" name="priority">
+                        <option value="Low" {% if complaint.priority == 'Low' %}selected{% endif %}>Low</option>
+                        <option value="Medium" {% if complaint.priority == 'Medium' %}selected{% endif %}>Medium</option>
+                        <option value="High" {% if complaint.priority == 'High' %}selected{% endif %}>High</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100">
+                        Save Status & Priority
+                    </button>
+                </div>
+            </form>
+
+            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                <span class="text-muted small">Authorized admin actions</span>
+                <form method="POST" action="{{ url_for('admin.delete_complaint', complaint_id=complaint.id) }}" onsubmit="return confirm('Are you sure you want to permanently delete Complaint #{{ complaint.id }}?');">
+                    <button type="submit" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1">
+                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                        <span>Delete Ticket</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}CampusFix – Modern Campus Complaint & Maintenance Management{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-center text-lg-start">
+    <div class="container py-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <span class="badge bg-primary bg-opacity-25 text-white border border-light border-opacity-25 px-3 py-2 rounded-pill mb-3 fw-semibold">
+                    <i data-lucide="sparkles" class="d-inline-block me-1" style="width: 14px; height: 14px;"></i> Intelligent Campus Infrastructure
+                </span>
+                <h1 class="hero-title mb-4">
+                    A Better Campus Starts With <span style="color: #60a5fa;">Better Reporting.</span>
+                </h1>
+                <p class="hero-subtitle mb-4">
+                    CampusFix is a centralized, streamlined platform empowering students to report classroom, lab, and hostel maintenance issues directly to administration. Track repair progress in real-time.
+                </p>
+                <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                    {% if current_user %}
+                        {% if current_user.role == 'admin' %}
+                            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary btn-lg px-4 d-inline-flex align-items-center gap-2">
+                                <i data-lucide="layout-dashboard"></i>
+                                <span>Go to Admin Dashboard</span>
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('student.submit_complaint') }}" class="btn btn-primary btn-lg px-4 d-inline-flex align-items-center gap-2">
+                                <i data-lucide="plus-circle"></i>
+                                <span>Report an Issue</span>
+                            </a>
+                            <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-light btn-lg px-4">
+                                <span>My Dashboard</span>
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-4 d-inline-flex align-items-center gap-2">
+                            <span>Get Started Free</span>
+                            <i data-lucide="arrow-right"></i>
+                        </a>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-4">
+                            <span>Student / Admin Login</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <!-- Preview Card Illustration -->
+                <div class="card card-custom shadow-lg border-0 bg-white text-dark p-4 rounded-4">
+                    <div class="d-flex align-items-center justify-content-between pb-3 border-bottom mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="p-2 bg-primary bg-opacity-10 text-primary rounded-3">
+                                <i data-lucide="bell" style="width: 20px; height: 20px;"></i>
+                            </span>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Live Campus Stream</h6>
+                                <small class="text-muted">Real-time resolution monitor</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1">Active</span>
+                    </div>
+
+                    <div class="d-flex flex-column gap-3">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge-status badge-resolved">Resolved</span>
+                                <small class="text-muted">CS Lab 204</small>
+                            </div>
+                            <div class="fw-semibold text-dark small">Overhead Projector HDMI Port Fixed</div>
+                        </div>
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge-status badge-in-progress">In Progress</span>
+                                <small class="text-muted">Library Block B</small>
+                            </div>
+                            <div class="fw-semibold text-dark small">Wi-Fi Access Point Diagnostic & Repair</div>
+                        </div>
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge-status badge-pending">Pending Review</span>
+                                <small class="text-muted">Mechanical Workshop</small>
+                            </div>
+                            <div class="fw-semibold text-dark small">Main Ceiling Fan Vibration Issue</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h6 class="text-primary text-uppercase fw-bold letter-spacing-1">Why CampusFix?</h6>
+            <h2 class="fw-bold display-6">Built For Transparent Campus Facilities</h2>
+            <p class="text-muted mx-auto" style="max-width: 650px;">
+                Say goodbye to lost paper registers and neglected complaints. CampusFix establishes accountability across academic and residential facilities.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box">
+                    <div class="feature-icon-circle">
+                        <i data-lucide="file-plus-2"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">1-Click Reporting</h5>
+                    <p class="text-muted small mb-0">
+                        Easily submit maintenance tickets for electrical, plumbing, network, furniture, or lab apparatus in seconds.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box">
+                    <div class="feature-icon-circle">
+                        <i data-lucide="activity"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Live Progress Tracking</h5>
+                    <p class="text-muted small mb-0">
+                        Follow the exact state of your complaint from Pending intake to In Progress dispatch and final Resolved sign-off.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box">
+                    <div class="feature-icon-circle">
+                        <i data-lucide="sliders"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Priority Triage</h5>
+                    <p class="text-muted small mb-0">
+                        Facility admins categorize, prioritize, and assign urgent issues (High, Medium, Low) to maximize campus safety.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box">
+                    <div class="feature-icon-circle">
+                        <i data-lucide="boxes"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">DevOps & Cloud Ready</h5>
+                    <p class="text-muted small mb-0">
+                        Packaged as a lightweight Docker container, tested via Pytest, and automated via Jenkins CI/CD on AWS EC2.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5 bg-white border-top border-bottom">
+    <div class="container py-3">
+        <div class="text-center mb-5">
+            <h6 class="text-primary text-uppercase fw-bold">Simple 3-Step Process</h6>
+            <h2 class="fw-bold">How CampusFix Operates</h2>
+        </div>
+
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="p-3">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-3 fw-bold fs-4" style="width: 56px; height: 56px;">1</div>
+                    <h5 class="fw-bold">Student Reports Problem</h5>
+                    <p class="text-muted small">Select category (e.g. Wi-Fi, Electrical), specify precise campus location, and submit problem details.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-3 fw-bold fs-4" style="width: 56px; height: 56px;">2</div>
+                    <h5 class="fw-bold">Admin Reviews & Dispatches</h5>
+                    <p class="text-muted small">Campus maintenance staff prioritizes the ticket and updates status to 'In Progress' upon dispatch.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-3 fw-bold fs-4" style="width: 56px; height: 56px;">3</div>
+                    <h5 class="fw-bold">Resolution & Transparency</h5>
+                    <p class="text-muted small">Once technicians fix the issue, ticket is marked 'Resolved' and student gets instant confirmation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 text-center">
+    <div class="container py-4">
+        <div class="card card-custom p-5 border-0 shadow-md bg-light">
+            <h2 class="fw-bold mb-3">Notice an issue in your campus or hostel?</h2>
+            <p class="text-muted mx-auto mb-4" style="max-width: 550px;">
+                Join students and faculty across campus in making our environment safer and better maintained.
+            </p>
+            <div>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-4 me-2">Register as Student</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-navy btn-lg px-4">Staff / Admin Login</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

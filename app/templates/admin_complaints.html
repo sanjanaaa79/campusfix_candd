@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Complaints – CampusFix Admin{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Admin Sidebar -->
+    <aside class="sidebar">
+        <div class="mb-4 px-2">
+            <span class="badge bg-danger mb-2 text-uppercase" style="font-size: 0.65rem;">Administration</span>
+            <div class="fw-bold text-dark fs-5">{{ current_user.name }}</div>
+            <div class="text-muted small text-truncate">{{ current_user.email }}</div>
+        </div>
+
+        <nav class="nav flex-column">
+            <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+                <i data-lucide="layout-dashboard" style="width: 18px; height: 18px;"></i>
+                <span>Admin Overview</span>
+            </a>
+            <a class="nav-link active" href="{{ url_for('admin.complaints_list') }}">
+                <i data-lucide="inbox" style="width: 18px; height: 18px;"></i>
+                <span>Complaints Manager</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="container-fluid p-0">
+            <!-- Header -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+                <div>
+                    <h2 class="fw-bold mb-1">Complaints Management</h2>
+                    <p class="text-muted mb-0">Search, triage, update status, and track resolution across all student reports.</p>
+                </div>
+            </div>
+
+            <!-- Filter & Search Toolbar -->
+            <div class="card card-custom border-0 p-3 mb-4">
+                <form method="GET" action="{{ url_for('admin.complaints_list') }}" class="row g-2 align-items-center">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+                            </span>
+                            <input 
+                                type="text" 
+                                class="form-control border-start-0" 
+                                name="q" 
+                                placeholder="Search by student, title, location..." 
+                                value="{{ q or '' }}"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-3">
+                        <select class="form-select auto-filter-select" name="status">
+                            <option value="">All Statuses</option>
+                            {% for st in statuses %}
+                                <option value="{{ st }}" {% if selected_status == st %}selected{% endif %}>{{ st }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2 col-md-3">
+                        <select class="form-select auto-filter-select" name="priority">
+                            <option value="">All Priorities</option>
+                            {% for pr in priorities %}
+                                <option value="{{ pr }}" {% if selected_priority == pr %}selected{% endif %}>{{ pr }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <select class="form-select auto-filter-select" name="category">
+                            <option value="">All Categories</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-lg-1 col-md-6 d-flex gap-1">
+                        <button type="submit" class="btn btn-navy w-100 px-2" title="Apply filter">
+                            <i data-lucide="filter" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        {% if q or selected_status or selected_priority or selected_category %}
+                            <a href="{{ url_for('admin.complaints_list') }}" class="btn btn-outline-secondary px-2" title="Reset filter">
+                                <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+
+            <!-- Complaints Table -->
+            <div class="card card-custom border-0">
+                <div class="card-header-clean d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">All Campus Complaints ({{ complaints|length }})</span>
+                </div>
+
+                {% if complaints %}
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Student</th>
+                                    <th>Complaint Details</th>
+                                    <th>Category</th>
+                                    <th>Location</th>
+                                    <th>Current Priority</th>
+                                    <th>Current Status</th>
+                                    <th>Quick Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in complaints %}
+                                    <tr>
+                                        <td class="fw-bold">#{{ c.id }}</td>
+                                        <td>
+                                            <div class="fw-semibold text-dark">{{ c.author.name }}</div>
+                                            <small class="text-muted">{{ c.author.email }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold text-dark">{{ c.title }}</div>
+                                            <small class="text-muted text-truncate d-inline-block" style="max-width: 220px;">{{ c.description }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge-category">{{ c.category }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="small text-muted d-flex align-items-center gap-1">
+                                                <i data-lucide="map-pin" style="width: 13px; height: 13px;"></i>
+                                                {{ c.location }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if c.priority == 'High' %}
+                                                <span class="badge-priority badge-priority-high">High</span>
+                                            {% elif c.priority == 'Medium' %}
+                                                <span class="badge-priority badge-priority-medium">Medium</span>
+                                            {% else %}
+                                                <span class="badge-priority badge-priority-low">Low</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if c.status == 'Pending' %}
+                                                <span class="badge-status badge-pending">Pending</span>
+                                            {% elif c.status == 'In Progress' %}
+                                                <span class="badge-status badge-in-progress">In Progress</span>
+                                            {% else %}
+                                                <span class="badge-status badge-resolved">Resolved</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <!-- Modal Trigger or Quick Update Form -->
+                                                <form method="POST" action="{{ url_for('admin.update_complaint', complaint_id=c.id) }}" class="d-flex align-items-center gap-1">
+                                                    <select name="status" class="form-select form-select-sm" style="width: 110px;" onchange="this.form.submit()">
+                                                        <option value="Pending" {% if c.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                                        <option value="In Progress" {% if c.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                                        <option value="Resolved" {% if c.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                                                    </select>
+                                                    <input type="hidden" name="priority" value="{{ c.priority }}">
+                                                </form>
+
+                                                <a href="{{ url_for('student.complaint_detail', complaint_id=c.id) }}" class="btn btn-sm btn-outline-primary" title="View Details">
+                                                    <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                                                </a>
+
+                                                <form method="POST" action="{{ url_for('admin.delete_complaint', complaint_id=c.id) }}" onsubmit="return confirm('Delete complaint #{{ c.id }}?');">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="p-5 text-center text-muted">
+                        <i data-lucide="search-x" style="width: 38px; height: 38px;" class="mb-2"></i>
+                        <p class="mb-0">No complaints match your filter criteria.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
