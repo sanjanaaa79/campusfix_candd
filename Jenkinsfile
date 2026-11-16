@@ -6,6 +6,8 @@ pipeline {
         IMAGE_NAME = 'campusfix'
         CONTAINER_NAME = 'campusfix-app'
         PORT = '5000'
+        // Add Python, Scripts, Docker, and Git to Jenkins execution PATH
+        PATH = "C:\\Users\\Sanjana Mukherjee\\AppData\\Local\\Programs\\Python\\Python312;C:\\Users\\Sanjana Mukherjee\\AppData\\Local\\Programs\\Python\\Python312\\Scripts;C:\\Users\\Sanjana Mukherjee\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;C:\\Program Files\\Git\\cmd;${env.PATH}"
     }
 
     options {
